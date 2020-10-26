@@ -1,6 +1,6 @@
 const conf = require('../conf.json');
 const mysql = require('mysql');
-const randomColor = require('randomColor');
+const randomColor = require('randomcolor');
 const standardEmbedMes = conf.discord.standardEmbedMes;
 const standardQuizMes = conf.discord.standardQuizMes;
 module.exports = {
