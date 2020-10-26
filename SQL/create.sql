@@ -167,7 +167,3 @@ insert into commands(command_name,command_help,command_template,function_name,gr
 values('makeChannels','Make a channel for every group or a specific group\n','group makeChannel (name of channel or empty for all)','makeChannelFunc',3,1);
 insert into commands(command_name,command_help,command_template,function_name,groups_group_id,needPerm)
 values('deleteChannels','Delete a channel for every group or a specific group\n','group deleteChannels (name of channel or empty for all)','deleteChannelFunc',3,1);
-INSERT INTO `guilds` VALUES ('766931101452337184','bots');
-insert into guild_groups (group_id,group_name,guilds_guild_discord_id,role_id,role_color) values(1, 'the boys', '766931101452337184', '768458098960498729', '#101010');
-insert into guild_group_members values('257585529229410304', 1, 1, 'the boys', '766931101452337184');
-
