@@ -1,5 +1,5 @@
 const conf = require('../conf.json');
-const randomColor = require('randomColor');
+const randomColor = require('randomcolor');
 const standardEmbedMes = conf.discord.standardEmbedMes;
 module.exports = {
     main: async function(funcName, message, client, args, prefix, mysqlCon) {
