@@ -72,9 +72,10 @@ CREATE TABLE IF NOT EXISTS `discord_bot_db`.`quiz_questions` (
   `answers` VARCHAR(1000) NULL,
   `amount_of_points` INT NULL DEFAULT 1,
   `time` INT NULL DEFAULT 30,
-  `correct_answer` VARCHAR(45) NULL,
-  `attachment_path` VARCHAR(1000) NULL,
+  `time_before_next` INT NULL DEFAULT 0,
+  `correct_answer` INT NULL,
   `guilds_guild_discord_id` VARCHAR(50) NOT NULL,
+  `guild_question_id` INT NOT NULL,
   PRIMARY KEY (`question_id`, `guilds_guild_discord_id`),
   INDEX `fk_quiz_questions_guilds1_idx` (`guilds_guild_discord_id` ASC),
   CONSTRAINT `fk_quiz_questions_guilds1`
@@ -147,7 +148,7 @@ values('ping','Pong!\n','ping','pingFunc',1);
 insert into commands(command_name,command_help,command_template,function_name,groups_group_id)
 values('help','Get a list of all available commands (DM)\n','help','helpFunc',1);
 insert into commands(command_name,command_help,command_template,function_name,groups_group_id, needPerm)
-values('addQuestion','Add a question to the quiz\nAttach a file to it, to let it show during the question.','quiz addQuestion (question) (time in seconds to answer) (amount of points) {multiple choice: correct answer, default: null} {multiple choice: possible answers, default: null}'
+values('addQuestion','Add a question to the quiz\n','quiz addQuestion'
 ,'addQuestionFunc',2,1);
 insert into commands(command_name,command_help,command_template,function_name,groups_group_id)
 values('create','Create a group to add people to\n','group create {OPTIONAL: hex role color: ex. #03fcfc} (name of group) ', 'createFunc',3);

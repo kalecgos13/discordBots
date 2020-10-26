@@ -21,6 +21,7 @@ mysqlConnection.connect(function (err) {
     console.log("Connected to database!");
 });
 client.on('message', async message => {
+    if (message.channel instanceof Discord.DMChannel) return;
     if (message.author.bot) return;
     if (!message.content.startsWith(prefix)) return;
     await checkGuild(message);
