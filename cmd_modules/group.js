@@ -317,7 +317,7 @@ async function changeLeaderFunc(message,client,args, prefix, mysqlCon) {
     });
 }
 async function makeChannelFunc(message,client,args, prefix, mysqlCon) {
-    if(!message.member.hasPermission("ADMINISTRATOR")) {
+    if(!message.member.hasPermission("ADMINISTRATOR") && !message.member.roles.cache.has(conf.discord.roles.administrator)) {
         message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "Not enough permissions", message.author.toString() + " you do not have the right role to use this command!", message, client) });
         return;
     }
@@ -374,7 +374,7 @@ async function makeChannelFunc(message,client,args, prefix, mysqlCon) {
     });
 }
 async function deleteChannelFunc(message,client,args, prefix, mysqlCon) {
-    if(!message.member.hasPermission("ADMINISTRATOR")) {
+    if(!message.member.hasPermission("ADMINISTRATOR") && !message.member.roles.cache.has(conf.discord.roles.administrator)) {
         message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "Not enough permissions", message.author.toString() + " you do not have the right role to use this command!", message, client) });
         return;
     }
