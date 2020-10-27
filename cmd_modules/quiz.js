@@ -7,16 +7,8 @@ const standardEmbedMes = conf.discord.standardEmbedMes;
 const standardQuizMes = conf.discord.standardQuizMes;
 module.exports = {
     quiz: async function (funcName, message, client, args, prefix, mysqlCon) {
-        switch (funcName) {
-            case 'addQuestionFunc':
-                addQuestionFunc(message, client, args, mysqlCon);
-                break;
-            case 'exportFunc':
-                exportFunc(message,client, args, mysqlCon);
-                break;
-            default:
-                message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "No such quiz command", "No quiz command found called `" + args[0] + "`\nType `" + prefix + "help` in order to view all commands", message, client) });
-        }
+        eval(funcName+"(message,client,args, prefix, mysqlCon)");
+                //message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "No such quiz command", "No quiz command found called `" + args[0] + "`\nType `" + prefix + "help` in order to view all commands", message, client) });
     }
 }
 
@@ -33,7 +25,7 @@ function generateStandardEmbed(standard, title, description, message, client) {
     return JSON.parse(JSON.stringify(embed));
 }
 
-async function addQuestionFunc(message, client, args, mysqlCon) {
+async function addQuestionFunc(message,client,args, prefix, mysqlCon) {
     if (!message.member.roles.cache.has(conf.discord.roles.quizMaster)) {
         message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "Not enough permissions", message.author.toString() + " you do not have the right role to use this command!", message, client) });
         return;
@@ -222,13 +214,13 @@ async function addQuestionFunc(message, client, args, mysqlCon) {
                 finished = true;
                 await responseMes.delete().catch(console.error);
                 await previewMes.delete().catch(console.error);
-                if (receivedMes.content == 'start') addQuestionFunc(message, client, args, mysqlCon);
+                if (receivedMes.content == 'start') addQuestionFunc(message,client,args, prefix, mysqlCon);
                 break;
         }
     }
 
 }
-async function exportFunc(message, client, args, mysqlCon) {
+async function exportFunc(message,client,args, prefix, mysqlCon) {
     if (!message.member.roles.cache.has(conf.discord.roles.quizMaster)) {
         message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "Not enough permissions", message.author.toString() + " you do not have the right role to use this command!", message, client) });
         return;

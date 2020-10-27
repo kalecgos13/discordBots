@@ -3,16 +3,7 @@ const randomColor = require('randomcolor');
 const standardEmbedMes = conf.discord.standardEmbedMes;
 module.exports = {
     main: async function(funcName, message, client, args, prefix, mysqlCon) {
-            switch(funcName) {
-                case "pingFunc":
-                    pingFunc(message,client,args);
-                    break;
-                case "helpFunc":
-                    helpFunc(message,client,args, prefix, mysqlCon);
-                    break;
-                default:
-                    message.channel.send({"embed":generateStandardEmbed(standardEmbedMes,"No such command", "No command found called `"+args[0]+"`\nType `"+prefix+"help` in order to view all commands", message, client)});
-            }
+        eval(funcName+"(message,client,args, prefix, mysqlCon)");
     }
 }
 
@@ -29,7 +20,7 @@ function generateStandardEmbed(standard,title,description,message, client) {
     return JSON.parse(JSON.stringify(embed));
 }
 
-async function pingFunc(message, client, args) {
+async function pingFunc(message, client, args, prefix, mysqlCon) {
     message.channel.send({"embed":generateStandardEmbed(standardEmbedMes,"Ping command", "Pong!\nLatency is `"+(Date.now() - message.createdTimestamp)+"ms`\nAPI Latency is `"+(Math.round(client.ws.ping))+"ms`", message, client)});
 }
 async function helpFunc(message, client, args, prefix, mysqlCon) {

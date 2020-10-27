@@ -13,6 +13,7 @@ const standardEmbedMes = config.discord.standardEmbedMes;
 const client = new Discord.Client();
 client.on('ready', () => {
     console.log('Connected');
+    client.user.setPresence({activity:{name: "Typ !help for a list of commands"}});
 });
 
 const mysqlConnection = mysql.createConnection(config.mysql.connectJson);
@@ -67,14 +68,6 @@ client.on('message', async message => {
         }
     });
     message.delete().catch(console.error);
-    /*if(command == "ping") {
-        message.delete().catch(console.error);
-        message.channel.send("pong");
-    }
-    if(command == "quiz") {
-        message.delete().catch(console.error);
-        if(!quizCommands.quizCommands(args, message, client)) message.channel.send({"embed":generateStandardEmbed(standardEmbedMes,"No such command", "No quiz command found called `"+args[0]+"`\nType `"+prefix+"quiz help` in order to view all commands", message, client)});
-    }*/
 });
 
 client.login(config.discord.token);

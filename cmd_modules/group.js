@@ -4,37 +4,8 @@ const randomColor = require('randomcolor');
 const standardEmbedMes = conf.discord.standardEmbedMes;
 module.exports = {
     group: async function (funcName, message, client, args, prefix, mysqlCon) {
-        switch (funcName) {
-            case "createFunc":
-                createFunc(message, args, mysqlCon, client);
-                break;
-            case "changeNameFunc":
-                changeNameFunc(message, args, mysqlCon, client);
-                break;
-            case "changeColorFunc":
-                changeColorFunc(message, args, mysqlCon, client);
-                break;
-            case "inviteFunc":
-                inviteFunc(message, args, mysqlCon, client);
-                break;
-            case "kickFunc":
-                kickFunc(message, args, mysqlCon, client);
-                break;
-            case "deleteFunc":
-                deleteFunc(message, args, mysqlCon, client);
-                break;
-            case "changeLeaderFunc":
-                changeLeaderFunc(message, args, mysqlCon, client);
-                break;
-            case "makeChannelFunc":
-                makeChannelFunc(message, args, mysqlCon, client);
-                break;
-            case "deleteChannelFunc":
-                deleteChannelFunc(message, args, mysqlCon, client);
-                break;
-            default:
-                message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "No such command", "No command found called `" + args[0] + "`\nType `" + prefix + "help` in order to view all commands", message, client) });
-        }
+        eval(funcName+"(message,client,args, prefix, mysqlCon)");
+                //message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "No such command", "No command found called `" + args[0] + "`\nType `" + prefix + "help` in order to view all commands", message, client) });
     }
 }
 
@@ -51,7 +22,7 @@ function generateStandardEmbed(standard, title, description, message, client) {
     return JSON.parse(JSON.stringify(embed));
 }
 
-async function createFunc(message, args, mysqlCon, client) {
+async function createFunc(message,client,args, prefix, mysqlCon) {
     if (args.length < 2) {
         message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "Missing parameter", "No name was given", message, client) });
         return;
@@ -106,7 +77,7 @@ async function createFunc(message, args, mysqlCon, client) {
 
 }
 
-async function changeNameFunc(message, args, mysqlCon, client) {
+async function changeNameFunc(message,client,args, prefix, mysqlCon) {
     console.log(message);
     if (args[1] == null) {
         message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "Missing parameter", "No new name was given.", message, client) });
@@ -137,7 +108,7 @@ async function changeNameFunc(message, args, mysqlCon, client) {
         }
     });
 }
-async function changeColorFunc(message, args, mysqlCon, client) {
+async function changeColorFunc(message,client,args, prefix, mysqlCon) {
     if (args[1] == null) {
         message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "Missing parameter", "No new role color was given.", message, client) });
         return;
@@ -164,7 +135,7 @@ async function changeColorFunc(message, args, mysqlCon, client) {
     });
 }
 
-async function inviteFunc(message, args, mysqlCon, client) {
+async function inviteFunc(message,client,args, prefix, mysqlCon) {
     if (args[1] == null) {
         message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "Missing parameter", "No mention was given.", message, client) });
         return;
@@ -229,7 +200,7 @@ async function inviteFunc(message, args, mysqlCon, client) {
     });
 }
 
-async function kickFunc(message, args, mysqlCon, client) {
+async function kickFunc(message,client,args, prefix, mysqlCon) {
     if (args[1] == null) {
         message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "Missing parameter", "No mention was given.", message, client) });
         return;
@@ -269,7 +240,7 @@ async function kickFunc(message, args, mysqlCon, client) {
     });
 }
 
-async function deleteFunc(message, args, mysqlCon, client) {
+async function deleteFunc(message,client,args, prefix, mysqlCon) {
     mysqlCon.query("select * from guild_group_members where member_id = " + message.author.id + " and guild_groups_guilds_guild_discord_id = " + message.guild.id, function (err, results) {
         if (err) throw error;
         if (results[0] == null || !results[0].isLeader) {
@@ -303,7 +274,7 @@ async function deleteFunc(message, args, mysqlCon, client) {
     });
 }
 
-async function changeLeaderFunc(message, args, mysqlCon, client) {
+async function changeLeaderFunc(message,client,args, prefix, mysqlCon) {
     if (args[1] == null) {
         message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "Missing parameter", "No mention was given.", message, client) });
         return;
@@ -345,7 +316,7 @@ async function changeLeaderFunc(message, args, mysqlCon, client) {
         }
     });
 }
-async function makeChannelFunc(message, args, mysqlCon, client) {
+async function makeChannelFunc(message,client,args, prefix, mysqlCon) {
     if(!message.member.hasPermission("ADMINISTRATOR")) {
         message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "Not enough permissions", message.author.toString() + " you do not have the right role to use this command!", message, client) });
         return;
@@ -402,7 +373,7 @@ async function makeChannelFunc(message, args, mysqlCon, client) {
         }
     });
 }
-async function deleteChannelFunc(message, args, mysqlCon, client) {
+async function deleteChannelFunc(message,client,args, prefix, mysqlCon) {
     if(!message.member.hasPermission("ADMINISTRATOR")) {
         message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "Not enough permissions", message.author.toString() + " you do not have the right role to use this command!", message, client) });
         return;
