@@ -148,8 +148,8 @@ values('ping','Pong!\n','ping','pingFunc',1);
 insert into commands(command_name,command_help,command_template,function_name,groups_group_id)
 values('help','Get a list of all available commands (DM)\n','help','helpFunc',1);
 insert into commands(command_name,command_help,command_template,function_name,groups_group_id, needPerm)
-values('addQuestion','Add a question to the quiz\n','quiz addQuestion'
-,'addQuestionFunc',2,1);
+values('addQuestionDM','Add a question to the quiz using DM\'s\n','quiz addQuestionDM'
+,'addQuestionDMFunc',2,1);
 insert into commands(command_name,command_help,command_template,function_name,groups_group_id)
 values('create','Create a group to add people to\n','group create {OPTIONAL: hex role color: ex. #03fcfc} (name of group) ', 'createFunc',3);
 insert into commands(command_name,command_help,command_template,function_name,groups_group_id)
@@ -168,3 +168,10 @@ insert into commands(command_name,command_help,command_template,function_name,gr
 values('makeChannels','Make a channel for every group or a specific group\n','group makeChannel (name of channel or empty for all)','makeChannelFunc',3,1);
 insert into commands(command_name,command_help,command_template,function_name,groups_group_id,needPerm)
 values('deleteChannels','Delete a channel for every group or a specific group\n','group deleteChannels (name of channel or empty for all)','deleteChannelFunc',3,1);
+insert into commands(command_name,command_help,command_template,function_name,groups_group_id,needPerm)
+values('addQuestions','Add a question to the quiz using a CSV file.\n','quiz addQuestions'
+,'addQuestionFunc',2,1);
+insert into commands(command_name,command_help,command_template,function_name,groups_group_id,needPerm)
+values('exportToExcel','Export all questions to an Excel file (will be DM\'ed).\n','quiz exportToExcel'
+,'exportFunc',2,1);
+
