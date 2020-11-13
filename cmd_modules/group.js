@@ -4,8 +4,8 @@ const randomColor = require('randomcolor');
 const standardEmbedMes = conf.discord.standardEmbedMes;
 module.exports = {
     group: async function (funcName, message, client, args, prefix, mysqlCon) {
-        eval(funcName+"(message,client,args, prefix, mysqlCon)");
-                //message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "No such command", "No command found called `" + args[0] + "`\nType `" + prefix + "help` in order to view all commands", message, client) });
+        eval(funcName + "(message,client,args, prefix, mysqlCon)");
+        //message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "No such command", "No command found called `" + args[0] + "`\nType `" + prefix + "help` in order to view all commands", message, client) });
     }
 }
 
@@ -22,7 +22,7 @@ function generateStandardEmbed(standard, title, description, message, client) {
     return JSON.parse(JSON.stringify(embed));
 }
 
-async function createFunc(message,client,args, prefix, mysqlCon) {
+async function createFunc(message, client, args, prefix, mysqlCon) {
     if (args.length < 2) {
         message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "Missing parameter", "No name was given", message, client) });
         return;
@@ -48,37 +48,44 @@ async function createFunc(message,client,args, prefix, mysqlCon) {
             return;
         }
         else {
-            mysqlCon.query("select max(group_id) as 'max' from guild_groups", async function (er, maxId) {
-                if (er) throw er;
-                let max = 0;
-                if (maxId[0].max != null) max = maxId[0].max;
-                let role = await message.guild.roles.create({
-                    "data": {
-                        "name": name,
-                        "color": roleColor,
-                        "mentionable": true
-                    }
-                });
-                client.guilds.resolve(message.guild.id).members.resolve(message.author.id).roles.add(role);
-                let insert = "insert into guild_groups values(" + (max + 1) + ",?,?,?,?,?)";
-                insert = mysql.format(insert, [name, message.guild.id, role.id, roleColor, null]);
-                mysqlCon.query(insert, function (error) {
-                    if (error) throw error;
-                    let insertMember = "insert into guild_group_members values(?,?,?,?,?)";
-                    insertMember = mysql.format(insertMember, [message.author.id, 1, (max + 1), name, message.guild.id]);
-                    mysqlCon.query(insertMember, function (error1) {
-                        if (error1) throw error1;
-                        message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "Group made", "Your group has been made.", message, client) });
+            mysqlCon.query("select * from guild_group_members where guild_groups_guilds_guild_discord_id = " + message.guild.id + " and member_id = " + message.author.id, function (checkErr, checkRes) {
+                if (checkErr) throw checkErr;
+                if (checkRes[0] != null) {
+                    message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "Already in a group", "You are already part of a group.", message, client) });
+                }
+                else {
+                    mysqlCon.query("select max(group_id) as 'max' from guild_groups", async function (er, maxId) {
+                        if (er) throw er;
+                        let max = 0;
+                        if (maxId[0].max != null) max = maxId[0].max;
+                        let role = await message.guild.roles.create({
+                            "data": {
+                                "name": name,
+                                "color": roleColor,
+                                "mentionable": true
+                            }
+                        });
+                        client.guilds.resolve(message.guild.id).members.resolve(message.author.id).roles.add(role);
+                        let insert = "insert into guild_groups values(" + (max + 1) + ",?,?,?,?,?)";
+                        insert = mysql.format(insert, [name, message.guild.id, role.id, roleColor, null]);
+                        mysqlCon.query(insert, function (error) {
+                            if (error) throw error;
+                            let insertMember = "insert into guild_group_members values(?,?,?,?,?)";
+                            insertMember = mysql.format(insertMember, [message.author.id, 1, (max + 1), name, message.guild.id]);
+                            mysqlCon.query(insertMember, function (error1) {
+                                if (error1) throw error1;
+                                message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "Group made", "Your group has been made.", message, client) });
+                            });
+                        });
                     });
-                });
+                }
             });
         }
     });
 
 }
 
-async function changeNameFunc(message,client,args, prefix, mysqlCon) {
-    console.log(message);
+async function changeNameFunc(message, client, args, prefix, mysqlCon) {
     if (args[1] == null) {
         message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "Missing parameter", "No new name was given.", message, client) });
         return;
@@ -89,15 +96,21 @@ async function changeNameFunc(message,client,args, prefix, mysqlCon) {
             message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "No group detected", "You are not part of a group or you are not the leader.", message, client) });
         }
         else {
-            mysqlCon.query("select role_id from guild_groups where group_id = " + results[0].guild_groups_group_id, function (error3, roleId) {
+            mysqlCon.query("select role_id, channel_id from guild_groups where group_id = " + results[0].guild_groups_group_id, function (error3, roleIdRes) {
                 if (error3) throw error3;
-                roleId = roleId[0].role_id;
+                let roleId = roleIdRes[0].role_id;
                 let name = "";
                 for (let i = 1; i < args.length; i++) {
                     name += args[i];
                     name += " ";
                 }
+                name = name.substring(0, name.length - 1);
                 message.guild.roles.resolve(roleId).setName(name);
+                console.log(roleIdRes[0]);
+                if (roleIdRes[0].channel_id != null) {
+                    console.log(name);
+                    message.guild.channels.resolve(roleIdRes[0].channel_id).setName(name.replace(/ /gi, "_"));
+                }
                 let insert = "update guild_groups set group_name = ? where guilds_guild_discord_id = ? and group_id = ?";
                 insert = mysql.format(insert, [name, message.guild.id, results[0].guild_groups_group_id]);
                 mysqlCon.query(insert, function (error) {
@@ -108,7 +121,7 @@ async function changeNameFunc(message,client,args, prefix, mysqlCon) {
         }
     });
 }
-async function changeColorFunc(message,client,args, prefix, mysqlCon) {
+async function changeColorFunc(message, client, args, prefix, mysqlCon) {
     if (args[1] == null) {
         message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "Missing parameter", "No new role color was given.", message, client) });
         return;
@@ -135,7 +148,7 @@ async function changeColorFunc(message,client,args, prefix, mysqlCon) {
     });
 }
 
-async function inviteFunc(message,client,args, prefix, mysqlCon) {
+async function inviteFunc(message, client, args, prefix, mysqlCon) {
     if (args[1] == null) {
         message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "Missing parameter", "No mention was given.", message, client) });
         return;
@@ -199,8 +212,26 @@ async function inviteFunc(message,client,args, prefix, mysqlCon) {
         }
     });
 }
-
-async function kickFunc(message,client,args, prefix, mysqlCon) {
+async function leaveFunc(message, client, args, prefix, mysqlCon) {
+    mysqlCon.query("select * from guild_group_members where member_id = " + message.author.id + " and guild_groups_guilds_guild_discord_id = " + message.guild.id, function (err, results) {
+        console.log(results);
+        if (err) throw err;
+        if (results[0] == null || results[0].isLeader == 1) {
+            message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "No group detected", "You are not part of a group or you are the leader.", message, client) });
+        }
+        else {
+            mysqlCon.query("select role_id from guild_groups where group_id = " + results[0].guild_groups_group_id, async function (error3, roleId) {
+                if (error3) throw error3;
+                roleId = roleId[0].role_id;
+                await message.member.roles.remove(roleId);
+                mysqlCon.query("delete from guild_group_members where member_id = " + message.author.id + " and guild_groups_group_id = " + results[0].guild_groups_group_id, function (error1) {
+                    if (error1) throw error;
+                });
+            });
+        }
+    });
+}
+async function kickFunc(message, client, args, prefix, mysqlCon) {
     if (args[1] == null) {
         message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "Missing parameter", "No mention was given.", message, client) });
         return;
@@ -240,7 +271,7 @@ async function kickFunc(message,client,args, prefix, mysqlCon) {
     });
 }
 
-async function deleteFunc(message,client,args, prefix, mysqlCon) {
+async function deleteFunc(message, client, args, prefix, mysqlCon) {
     mysqlCon.query("select * from guild_group_members where member_id = " + message.author.id + " and guild_groups_guilds_guild_discord_id = " + message.guild.id, function (err, results) {
         if (err) throw error;
         if (results[0] == null || !results[0].isLeader) {
@@ -274,7 +305,7 @@ async function deleteFunc(message,client,args, prefix, mysqlCon) {
     });
 }
 
-async function changeLeaderFunc(message,client,args, prefix, mysqlCon) {
+async function changeLeaderFunc(message, client, args, prefix, mysqlCon) {
     if (args[1] == null) {
         message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "Missing parameter", "No mention was given.", message, client) });
         return;
@@ -316,8 +347,8 @@ async function changeLeaderFunc(message,client,args, prefix, mysqlCon) {
         }
     });
 }
-async function makeChannelFunc(message,client,args, prefix, mysqlCon) {
-    if(!message.member.hasPermission("ADMINISTRATOR") && !message.member.roles.cache.has(conf.discord.roles.administrator)) {
+async function makeChannelFunc(message, client, args, prefix, mysqlCon) {
+    if (!message.member.hasPermission("ADMINISTRATOR") && !message.member.roles.cache.has(conf.discord.roles.administrator)) {
         message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "Not enough permissions", message.author.toString() + " you do not have the right role to use this command!", message, client) });
         return;
     }
@@ -325,9 +356,9 @@ async function makeChannelFunc(message,client,args, prefix, mysqlCon) {
     if (groupCat == null) {
         await message.guild.channels.create('groups', {
             "type": "category",
-            "permissionOverwrites":[{
-                "id":message.guild.roles.everyone.id,
-                "deny":['VIEW_CHANNEL']
+            "permissionOverwrites": [{
+                "id": message.guild.roles.everyone.id,
+                "deny": ['VIEW_CHANNEL']
             }]
         }).then(madeChannel => {
             groupCat = message.guild.channels.cache.find(channel => channel.name == "groups");
@@ -360,21 +391,21 @@ async function makeChannelFunc(message,client,args, prefix, mysqlCon) {
                     mysqlCon.query("update guild_groups set channel_id = " + createdChannel.id + " where group_id = " + results[i].group_id, function (er) {
                         if (er) throw er;
                     });
-                    await createdChannel.setParent(message.guild.channels.cache.find(channel => channel.name == "groups"), {"lockPermissions":true});
+                    await createdChannel.setParent(message.guild.channels.cache.find(channel => channel.name == "groups"), { "lockPermissions": true });
                     await createdChannel.overwritePermissions([{
                         "id": results[i].role_id,
-                        "allow":['ADD_REACTIONS','VIEW_CHANNEL','SEND_MESSAGES','SEND_TTS_MESSAGES','EMBED_LINKS','ATTACH_FILES','READ_MESSAGE_HISTORY','MENTION_EVERYONE','USE_EXTERNAL_EMOJIS']
-                    },{
-                        "id":message.guild.roles.everyone.id,
-                        "deny":['VIEW_CHANNEL']
+                        "allow": ['ADD_REACTIONS', 'VIEW_CHANNEL', 'SEND_MESSAGES', 'SEND_TTS_MESSAGES', 'EMBED_LINKS', 'ATTACH_FILES', 'READ_MESSAGE_HISTORY', 'MENTION_EVERYONE', 'USE_EXTERNAL_EMOJIS']
+                    }, {
+                        "id": message.guild.roles.everyone.id,
+                        "deny": ['VIEW_CHANNEL']
                     }]);
                 });
             }
         }
     });
 }
-async function deleteChannelFunc(message,client,args, prefix, mysqlCon) {
-    if(!message.member.hasPermission("ADMINISTRATOR") && !message.member.roles.cache.has(conf.discord.roles.administrator)) {
+async function deleteChannelFunc(message, client, args, prefix, mysqlCon) {
+    if (!message.member.hasPermission("ADMINISTRATOR") && !message.member.roles.cache.has(conf.discord.roles.administrator)) {
         message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "Not enough permissions", message.author.toString() + " you do not have the right role to use this command!", message, client) });
         return;
     }
@@ -391,12 +422,12 @@ async function deleteChannelFunc(message,client,args, prefix, mysqlCon) {
         query = mysql.format(query, [name]);
     }
     console.log(query);
-    mysqlCon.query(query, function(err, results){
-        if(err) throw err;
-        for(let i = 0;i<results.length;i++) {
+    mysqlCon.query(query, function (err, results) {
+        if (err) throw err;
+        for (let i = 0; i < results.length; i++) {
             message.guild.channels.resolve(results[i].channel_id).delete();
-            mysqlCon.query("update guild_groups set channel_id = null where group_id = "+results[i].group_id, function(error){
-                if(error) throw error;
+            mysqlCon.query("update guild_groups set channel_id = null where group_id = " + results[i].group_id, function (error) {
+                if (error) throw error;
             });
         }
     });

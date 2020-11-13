@@ -174,4 +174,8 @@ values('addQuestions','Add a question to the quiz using a CSV file.\n','quiz add
 insert into commands(command_name,command_help,command_template,function_name,groups_group_id,needPerm)
 values('exportToExcel','Export all questions to an Excel file (will be DM\'ed).\n','quiz exportToExcel'
 ,'exportFunc',2,1);
+insert into commands(command_name,command_help,command_template,function_name,groups_group_id)
+values('kick','Kick a member from your group (have to be the leader)\n','group kick (@mention of user)','kickFunc',3);
+insert into commands(command_name, command_help, command_template, function_name, groups_group_id, needPerm)
+values('shuffleVoice','Shuffle members into the designated voice channels (users should already be in a voice channel)\nArguments:\n`-c`: name of voice channels (ex: `-c group_1 group_2`)\n`-m`: mentioned members, can be a rolementions, member mentions or @everyone)\n','shuffleVoice -c (channels) -m (mention)','shuffleVoiceFunc',1,1);
 

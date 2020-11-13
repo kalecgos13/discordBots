@@ -13,7 +13,7 @@ const standardEmbedMes = config.discord.standardEmbedMes;
 const client = new Discord.Client();
 client.on('ready', () => {
     console.log('Connected');
-    client.user.setPresence({activity:{name: "Typ !help for a list of commands"}});
+    client.user.setActivity("For !help",{type:"WATCHING"});
 });
 
 const mysqlConnection = mysql.createConnection(config.mysql.connectJson);
