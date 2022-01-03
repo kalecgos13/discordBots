@@ -107,3 +107,4 @@ dist
 #Config
 conf.json
 *DS_Store*
+data.json

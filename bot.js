@@ -301,11 +301,10 @@ function sendEndSongMessage(indexToUse) {
 
 function regexTime(stringToRegexAndStuff) {
     stringToRegexAndStuff = removeAllThosePeskyDiacritics(stringToRegexAndStuff);
-    stringToRegexAndStuff = stringToRegexAndStuff.split('-')[0].toUpperCase();
-    stringToRegexAndStuff = stringToRegexAndStuff.split(',')[0];
     stringToRegexAndStuff = stringToRegexAndStuff.replace(/ *\([^)]*\) */g, "");
     stringToRegexAndStuff = stringToRegexAndStuff.replace(/ *\[[^)]*\] */g, "");
     stringToRegexAndStuff = stringToRegexAndStuff.replace(/ *\{[^)]*\} */g, "");
+    stringToRegexAndStuff = stringToRegexAndStuff.split('-')[0].toUpperCase();
     return stringToRegexAndStuff.replace(/[^a-zA-Z0-9]/g, "").trim();
 }
 
@@ -417,6 +416,7 @@ async function getPlaylistAndPutInObject(playlistId, amountOfTracks) {
     if(amountOfTracks > playlistObject.length) {
         amountOfTracks = playlistObject.length;
     }
+    //fs.writeFileSync('./data.json', JSON.stringify(playlistObject));
     return playlistObject.sort(() => 0.5 - Math.random()).slice(0, amountOfTracks);
 }
 
@@ -516,12 +516,12 @@ var diacriticsMap = [
     {'base':'ss','letters':/[\u00DF]/g},
     {'base':'t','letters':/[\u0074\u24E3\uFF54\u1E6B\u1E97\u0165\u1E6D\u021B\u0163\u1E71\u1E6F\u0167\u01AD\u0288\u2C66\uA787]/g},
     {'base':'tz','letters':/[\uA729]/g},
-    {'base':'u','letters':/[\u0075\u24E4\uFF55\u00F9\u00FA\u00FB\u0169\u1E79\u016B\u1E7B\u016D\u01DC\u01D8\u01D6\u01DA\u1EE7\u016F\u0171\u01D4\u0215\u0217\u01B0\u1EEB\u1EE9\u1EEF\u1EED\u1EF1\u1EE5\u1E73\u0173\u1E77\u1E75\u0289]/g},
-    {'base':'ue','letters':/[\u00FC]/g},
+    {'base':'u','letters':/[\u0075\u24E4\uFF55\u00F9\u00FA\u00FB\u0169\u00FC\u1E79\u016B\u1E7B\u016D\u01DC\u01D8\u01D6\u01DA\u1EE7\u016F\u0171\u01D4\u0215\u0217\u01B0\u1EEB\u1EE9\u1EEF\u1EED\u1EF1\u1EE5\u1E73\u0173\u1E77\u1E75\u0289]/g},
     {'base':'v','letters':/[\u0076\u24E5\uFF56\u1E7D\u1E7F\u028B\uA75F\u028C]/g},
     {'base':'vy','letters':/[\uA761]/g},
     {'base':'w','letters':/[\u0077\u24E6\uFF57\u1E81\u1E83\u0175\u1E87\u1E85\u1E98\u1E89\u2C73]/g},
     {'base':'x','letters':/[\u0078\u24E7\uFF58\u1E8B\u1E8D]/g},
     {'base':'y','letters':/[\u0079\u24E8\uFF59\u1EF3\u00FD\u0177\u1EF9\u0233\u1E8F\u00FF\u1EF7\u1E99\u1EF5\u01B4\u024F\u1EFF]/g},
-    {'base':'z','letters':/[\u007A\u24E9\uFF5A\u017A\u1E91\u017C\u017E\u1E93\u1E95\u01B6\u0225\u0240\u2C6C\uA763]/g}
+    {'base':'z','letters':/[\u007A\u24E9\uFF5A\u017A\u1E91\u017C\u017E\u1E93\u1E95\u01B6\u0225\u0240\u2C6C\uA763]/g},
+    {'base':'and','letters':/[\u0026]/g}
 ];
