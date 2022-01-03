@@ -139,9 +139,10 @@ SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 
 
 use discord_bot_db;
-insert into groups(group_name) values('main');
-insert into groups(group_name) values('quiz');
-insert into groups(group_name) values('group');
+insert into `groups`(group_name) values('main');
+insert into `groups`(group_name) values('quiz');
+insert into `groups`(group_name) values('group');
+insert into `groups`(group_name) values('music');
 
 insert into commands(command_name,command_help,command_template,function_name,groups_group_id)
 values('ping','Pong!\n','ping','pingFunc',1);
@@ -178,4 +179,6 @@ insert into commands(command_name,command_help,command_template,function_name,gr
 values('kick','Kick a member from your group (have to be the leader)\n','group kick (@mention of user)','kickFunc',3);
 insert into commands(command_name, command_help, command_template, function_name, groups_group_id, needPerm)
 values('shuffleVoice','Shuffle members into the designated voice channels (users should already be in a voice channel)\nArguments:\n`-c`: name of voice channels (ex: `-c group_1 group_2`)\n`-m`: mentioned members, can be a rolementions, member mentions or @everyone)\n','shuffleVoice -c (channels) -m (mention)','shuffleVoiceFunc',1,1);
+insert into commands(command_name, command_help, command_template, function_name, groups_group_id, needPerm)
+values('quiz','Starts a music quiz\nThe `playlistID` is this part of the spotify playlist url, if you do not fill in the playlistId, it will use the default one.\n`https://open.spotify.com/playlist/{playListId}?si=...`\n','music quiz (amount of rounds) (playlistId)','quizFunc',4, 0);
 

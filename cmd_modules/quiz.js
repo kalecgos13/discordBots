@@ -8,7 +8,7 @@ const standardEmbedMes = conf.discord.standardEmbedMes;
 module.exports = {
     quiz: async function (funcName, message, client, args, prefix, mysqlCon) {
         eval(funcName + "(message,client,args, prefix, mysqlCon)");
-        //message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "No such quiz command", "No quiz command found called `" + args[0] + "`\nType `" + prefix + "help` in order to view all commands", message, client) });
+        //message.channel.send({ "embeds": [generateStandardEmbed(standardEmbedMes, "No such quiz command", "No quiz command found called `" + args[0] + "`\nType `" + prefix + "help` in order to view all commands", message, client) });
     }
 }
 
@@ -27,17 +27,17 @@ function generateStandardEmbed(standard, title, description, message, client) {
 
 async function addQuestionDMFunc(message, client, args, prefix, mysqlCon) {
     if (!message.member.roles.cache.has(conf.discord.roles.quizMaster)) {
-        message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "Not enough permissions", message.author.toString() + " you do not have the right role to use this command!", message, client) });
+        message.channel.send({ "embeds": [generateStandardEmbed(standardEmbedMes, "Not enough permissions", message.author.toString() + " you do not have the right role to use this command!", message, client)] });
         return;
     }
-    previewEmbed = { "embed": generateStandardEmbed(standardEmbedMes, "(PREVIEW) Question X", "", message, client) };
+    previewEmbed = { "embeds": [generateStandardEmbed(standardEmbedMes, "(PREVIEW) Question X", "", message, client)] };
     let previewMes = null;
     await message.author.send(previewEmbed).then(async mes => {
         previewMes = mes;
     });
     let responseMes = null;
     let section = 'QUESTION'
-    await message.author.send({ "embed": generateStandardEmbed(standardEmbedMes, "Add a question", "Typ the question and press enter.\nType `quit` to stop creating a question and `back` to move back to the previous section.\n(You have 60 seconds for each section)", message, client) }).then(async mes => {
+    await message.author.send({ "embeds": [generateStandardEmbed(standardEmbedMes, "Add a question", "Typ the question and press enter.\nType `quit` to stop creating a question and `back` to move back to the previous section.\n(You have 60 seconds for each section)", message, client)] }).then(async mes => {
         responseMes = mes;
     });
     const filter = response => {
@@ -77,12 +77,12 @@ async function addQuestionDMFunc(message, client, args, prefix, mysqlCon) {
                 previewEmbed.embed.description = "**" + question + "**";
                 await previewMes.edit(previewEmbed);
                 section = 'ANSWERS';
-                await responseMes.edit({ "embed": generateStandardEmbed(standardEmbedMes, "Add the answers", "Typ the given answers for this question (seperate by `;` and there is a limit to **6** answers).\nIf this is an open question, type `null`.", message, client) });
+                await responseMes.edit({ "embeds": [generateStandardEmbed(standardEmbedMes, "Add the answers", "Typ the given answers for this question (seperate by `;` and there is a limit to **6** answers).\nIf this is an open question, type `null`.", message, client)] });
                 break;
             case 'ANSWERS':
                 if (receivedMes.content == 'back') {
                     section = 'QUESTION';
-                    await responseMes.edit({ "embed": generateStandardEmbed(standardEmbedMes, "Add a question", "Typ the question and press enter.\nType `quit` to stop creating a question and `back` to move back to the previous section.\n(You have 60 seconds for each section)", message, client) });
+                    await responseMes.edit({ "embeds": [generateStandardEmbed(standardEmbedMes, "Add a question", "Typ the question and press enter.\nType `quit` to stop creating a question and `back` to move back to the previous section.\n(You have 60 seconds for each section)", message, client) ]});
                     break;
                 }
                 if (receivedMes.content != 'null') {
@@ -97,7 +97,7 @@ async function addQuestionDMFunc(message, client, args, prefix, mysqlCon) {
                         value: "The group leader has to typ the answer in the chat."
                     }
                     await previewMes.edit(previewEmbed);
-                    await responseMes.edit({ "embed": generateStandardEmbed(standardEmbedMes, "Amount of points", "Typ the amount of points this question can give.", message, client) });
+                    await responseMes.edit({ "embeds": [generateStandardEmbed(standardEmbedMes, "Amount of points", "Typ the amount of points this question can give.", message, client)] });
                     section = 'POINTS';
                 }
                 else {
@@ -111,7 +111,7 @@ async function addQuestionDMFunc(message, client, args, prefix, mysqlCon) {
                             }
                         }
                         await previewMes.edit(previewEmbed);
-                        await responseMes.edit({ "embed": generateStandardEmbed(standardEmbedMes, "Select the correct answer", "Typ the letter that corresponds to the correct answer for this question.\n\n**NOTE** The correct answer will be in italic in the preview, this will **NOT** show during the actual quiz.", message, client) });
+                        await responseMes.edit({ "embeds": [generateStandardEmbed(standardEmbedMes, "Select the correct answer", "Typ the letter that corresponds to the correct answer for this question.\n\n**NOTE** The correct answer will be in italic in the preview, this will **NOT** show during the actual quiz.", message, client) ]});
                         section = 'CORRECT';
                     }
 
@@ -121,7 +121,7 @@ async function addQuestionDMFunc(message, client, args, prefix, mysqlCon) {
                 if (receivedMes.content == 'back') {
                     section = 'ANSWERS';
                     console.log("backing from correct");
-                    await responseMes.edit({ "embed": generateStandardEmbed(standardEmbedMes, "Add the answers", "Typ the given answers for this question (seperate by `;` and there is a limit to **6** answers).\nIf this is an open question, type `null`.", message, client) });
+                    await responseMes.edit({ "embeds": [generateStandardEmbed(standardEmbedMes, "Add the answers", "Typ the given answers for this question (seperate by `;` and there is a limit to **6** answers).\nIf this is an open question, type `null`.", message, client)] });
                     break;
                 }
                 if (receivedMes.content.length != 1) break;
@@ -133,18 +133,18 @@ async function addQuestionDMFunc(message, client, args, prefix, mysqlCon) {
                     else previewEmbed.embed.fields[i].value = answers[i];
                 }
                 await previewMes.edit(previewEmbed);
-                await responseMes.edit({ "embed": generateStandardEmbed(standardEmbedMes, "Amount of points", "Typ the amount of points this question can give.", message, client) });
+                await responseMes.edit({ "embeds": [generateStandardEmbed(standardEmbedMes, "Amount of points", "Typ the amount of points this question can give.", message, client) ]});
                 section = 'POINTS';
                 break;
             case 'POINTS':
                 if (receivedMes.content == 'back') {
                     if (answers == null) {
                         section = 'ANSWERS';
-                        await responseMes.edit({ "embed": generateStandardEmbed(standardEmbedMes, "Add the answers", "Typ the given answers for this question (seperate by space and there is a limit to **6** answers).\nIf this is an open question, type `null`.", message, client) });
+                        await responseMes.edit({ "embeds": [generateStandardEmbed(standardEmbedMes, "Add the answers", "Typ the given answers for this question (seperate by space and there is a limit to **6** answers).\nIf this is an open question, type `null`.", message, client) ]});
                     }
                     else {
                         section = 'CORRECT';
-                        await responseMes.edit({ "embed": generateStandardEmbed(standardEmbedMes, "Select the correct answer", "Typ the letter that corresponds to the correct answer for this question.\n\n**NOTE** The correct answer will be in italic in the preview, this will **NOT** show during the actual quiz.", message, client) });
+                        await responseMes.edit({ "embeds": [generateStandardEmbed(standardEmbedMes, "Select the correct answer", "Typ the letter that corresponds to the correct answer for this question.\n\n**NOTE** The correct answer will be in italic in the preview, this will **NOT** show during the actual quiz.", message, client)] });
                     }
                     break;
                 }
@@ -153,12 +153,12 @@ async function addQuestionDMFunc(message, client, args, prefix, mysqlCon) {
                 previewEmbed.embed.title = "(PREVIEW) Question X (" + points + " Point(s))";
                 await previewMes.edit(previewEmbed);
                 section = 'TIME';
-                await responseMes.edit({ "embed": generateStandardEmbed(standardEmbedMes, "Amount of time given", "Typ the amount of time (in seconds) given for this question", message, client) });
+                await responseMes.edit({ "embeds": [generateStandardEmbed(standardEmbedMes, "Amount of time given", "Typ the amount of time (in seconds) given for this question", message, client) ]});
                 break;
             case 'TIME':
                 if (receivedMes.content == 'back') {
                     section = 'POINTS';
-                    await responseMes.edit({ "embed": generateStandardEmbed(standardEmbedMes, "Amount of points", "Typ the amount of points this question can give.", message, client) });
+                    await responseMes.edit({ "embeds": [generateStandardEmbed(standardEmbedMes, "Amount of points", "Typ the amount of points this question can give.", message, client)] });
                     break;
                 }
                 if (Number.isNaN(+receivedMes.content)) break;
@@ -170,13 +170,13 @@ async function addQuestionDMFunc(message, client, args, prefix, mysqlCon) {
                     value: time + " Second(s)"
                 };
                 await previewMes.edit(previewEmbed);
-                await responseMes.edit({ "embed": generateStandardEmbed(standardEmbedMes, "Amount of time before next question", "Typ the amount of time (in seconds) before the next question is given.\n\n**NOTE**The time will be shown in the preview, but this will **NOT** be shown during the actual quiz.", message, client) });
+                await responseMes.edit({ "embeds": [generateStandardEmbed(standardEmbedMes, "Amount of time before next question", "Typ the amount of time (in seconds) before the next question is given.\n\n**NOTE**The time will be shown in the preview, but this will **NOT** be shown during the actual quiz.", message, client) ]});
                 section = 'TIMEBEFORENEXT';
                 break;
             case 'TIMEBEFORENEXT':
                 if (receivedMes.content == 'back') {
                     section = 'TIME';
-                    await responseMes.edit({ "embed": generateStandardEmbed(standardEmbedMes, "Amount of time given", "Typ the amount of time (in seconds) given for this question", message, client) });
+                    await responseMes.edit({ "embeds": [generateStandardEmbed(standardEmbedMes, "Amount of time given", "Typ the amount of time (in seconds) given for this question", message, client) ]});
                     break;
                 }
                 if (Number.isNaN(+receivedMes.content)) break;
@@ -189,12 +189,12 @@ async function addQuestionDMFunc(message, client, args, prefix, mysqlCon) {
                 };
                 await previewMes.edit(previewEmbed);
                 section = 'CHECK';
-                await responseMes.edit({ "embed": generateStandardEmbed(standardEmbedMes, "Checking", "Check the preview to see if everything is correct.\nIf so, type `yes` to add the question.", message, client) });
+                await responseMes.edit({ "embeds": [generateStandardEmbed(standardEmbedMes, "Checking", "Check the preview to see if everything is correct.\nIf so, type `yes` to add the question.", message, client)] });
                 break;
             case 'CHECK':
                 if (receivedMes.content == 'back') {
                     section = 'TIMEBEFORENEXT';
-                    await responseMes.edit({ "embed": generateStandardEmbed(standardEmbedMes, "Amount of time before next question", "Typ the amount of time (in seconds) before the next question is given.\n\n**NOTE**The time will be shown in the preview, but this will **NOT** be shown during the actual quiz.", message, client) });
+                    await responseMes.edit({ "embeds": [generateStandardEmbed(standardEmbedMes, "Amount of time before next question", "Typ the amount of time (in seconds) before the next question is given.\n\n**NOTE**The time will be shown in the preview, but this will **NOT** be shown during the actual quiz.", message, client) ]});
                     break;
                 }
                 if (receivedMes.content != 'yes') break;
@@ -206,7 +206,7 @@ async function addQuestionDMFunc(message, client, args, prefix, mysqlCon) {
                     mysqlCon.query(query, async function (err) {
                         if (err) throw err;
                         section = 'LAST';
-                        await responseMes.edit({ "embed": generateStandardEmbed(standardEmbedMes, "Success", "Successfully added the question\nTyp `start` to add another question or anything else to quit (or wait 60 seconds and it will quit by itself).", message, client) });
+                        await responseMes.edit({ "embeds": [generateStandardEmbed(standardEmbedMes, "Success", "Successfully added the question\nTyp `start` to add another question or anything else to quit (or wait 60 seconds and it will quit by itself).", message, client) ]});
                     });
                 });
                 break;
@@ -222,7 +222,7 @@ async function addQuestionDMFunc(message, client, args, prefix, mysqlCon) {
 }
 async function exportFunc(message, client, args, prefix, mysqlCon) {
     if (!message.member.roles.cache.has(conf.discord.roles.quizMaster)) {
-        message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "Not enough permissions", message.author.toString() + " you do not have the right role to use this command!", message, client) });
+        message.channel.send({ "embeds": [generateStandardEmbed(standardEmbedMes, "Not enough permissions", message.author.toString() + " you do not have the right role to use this command!", message, client) ]});
         return;
     }
     let workbook = await getQuestions(message, mysqlCon);
@@ -234,14 +234,14 @@ async function exportFunc(message, client, args, prefix, mysqlCon) {
 
 async function addQuestionFunc(message, client, args, prefix, mysqlCon) {
     if (!message.member.roles.cache.has(conf.discord.roles.quizMaster)) {
-        message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "Not enough permissions", message.author.toString() + " you do not have the right role to use this command!", message, client) });
+        message.channel.send({ "embeds": [generateStandardEmbed(standardEmbedMes, "Not enough permissions", message.author.toString() + " you do not have the right role to use this command!", message, client)] });
         return;
     }
     const filter = response => {
         return true;
     }
     let sentMessage = null;
-    await message.author.send({ files: ['./files/quizQuestionsTemplate.xlsx'], "embed": generateStandardEmbed(standardEmbedMes, "Adding a question", "Use this template (see attached file) to add questions.\n You have 60 seconds to attach the xlsx file with the questions to a message in this DM (You can also call the command again to attach it if you are not fast enough).\n\nKeep in mind, any questions that you already have in the database will be overwritten by this xlsx file.\nSo if you already have questions, use `" + prefix + "quiz exportToExcel` to get the xlsx filled with the questions.\nYou can then use that xlsx file to modify the questions.", message, client) }).then(mes => {
+    await message.author.send({ files: ['./files/quizQuestionsTemplate.xlsx'], "embeds": [generateStandardEmbed(standardEmbedMes, "Adding a question", "Use this template (see attached file) to add questions.\n You have 60 seconds to attach the xlsx file with the questions to a message in this DM (You can also call the command again to attach it if you are not fast enough).\n\nKeep in mind, any questions that you already have in the database will be overwritten by this xlsx file.\nSo if you already have questions, use `" + prefix + "quiz exportToExcel` to get the xlsx filled with the questions.\nYou can then use that xlsx file to modify the questions.", message, client)] }).then(mes => {
         sentMessage = mes;
     });
     let receivedMes = null;
@@ -341,13 +341,13 @@ async function addQuestionsFromExcel(message, receivedMes, fileName, client, mys
                     if (error1) throw error1;
                 });
             }
-            message.author.send({ "embed": generateStandardEmbed(standardEmbedMes, "Success!", "Added " + allQuestions.length + " questions!", message, client) });
+            message.author.send({ "embeds": [generateStandardEmbed(standardEmbedMes, "Success!", "Added " + allQuestions.length + " questions!", message, client) ]});
         });
     }
     catch (error) {
         if (error instanceof CustomError) {
             console.log(error.message);
-            message.author.send({ "embed": generateStandardEmbed(standardEmbedMes, "Error", error.message, message, client) });
+            message.author.send({ "embeds": [generateStandardEmbed(standardEmbedMes, "Error", error.message, message, client)] });
         }
         else throw error;
     }

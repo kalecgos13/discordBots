@@ -21,11 +21,11 @@ function generateStandardEmbed(standard, title, description, message, client) {
 }
 
 async function pingFunc(message, client, args, prefix, mysqlCon) {
-    message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "Ping command", "Pong!\nLatency is `" + (Date.now() - message.createdTimestamp) + "ms`\nAPI Latency is `" + (Math.round(client.ws.ping)) + "ms`", message, client) });
+    message.channel.send({ "embeds": [generateStandardEmbed(standardEmbedMes, "Ping command", "Pong!\nLatency is `" + (Date.now() - message.createdTimestamp) + "ms`\nAPI Latency is `" + (Math.round(client.ws.ping)) + "ms`", message, client) ]});
 }
 async function helpFunc(message, client, args, prefix, mysqlCon) {
     let embedTemplate = generateStandardEmbed(standardEmbedMes, "Help command", "Here is a list of all available commands sorted by groups\n**NOTE: a 🛠️ infront of a command means that only certain roles can use it.**\n\nServer prefix =`" + prefix + "`.", message, client);
-    mysqlCon.query("select * from commands join groups on groups_group_id = group_id order by groups_group_id", function (err, results) {
+    mysqlCon.query("select * from commands join `groups` on groups_group_id = group_id order by groups_group_id", function (err, results) {
         if (err) throw err;
         let fieldsArr = [];
         let currentGroupId = -1;
@@ -55,17 +55,17 @@ async function helpFunc(message, client, args, prefix, mysqlCon) {
         console.log(fieldsArr);
         embedTemplate.fields = [];
         embedTemplate.fields = fieldsArr;
-        message.author.send({ "embed": embedTemplate });
+        message.author.send({ "embeds": [embedTemplate] });
     });
 }
 
 async function shuffleVoiceFunc(message, client, args, prefix, mysqlCon) {
     if (!message.member.hasPermission("ADMINISTRATOR") && !message.member.roles.cache.has(conf.discord.roles.administrator)) {
-        message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "Not enough permissions", message.author.toString() + " you do not have the right role to use this command!", message, client) });
+        message.channel.send({ "embeds": [generateStandardEmbed(standardEmbedMes, "Not enough permissions", message.author.toString() + " you do not have the right role to use this command!", message, client) ]});
         return;
     }
     if (!args.includes('-m') || !args.includes('-c')) {
-        message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "Not enough arguments", message.author.toString() + " you miss either the `-m` or `-c`.", message, client) });
+        message.channel.send({ "embeds": [generateStandardEmbed(standardEmbedMes, "Not enough arguments", message.author.toString() + " you miss either the `-m` or `-c`.", message, client)] });
         return;
     }
     let indexOfChannels;
@@ -81,7 +81,7 @@ async function shuffleVoiceFunc(message, client, args, prefix, mysqlCon) {
         if (args[i] == '-m') break;
         let channelTest = message.guild.channels.cache.find(channel => channel.name == args[i]);
         if (channelTest == undefined || channelTest.type != 'voice') {
-            message.channel.send({ "embed": generateStandardEmbed(standardEmbedMes, "Error", message.author.toString() + " `" + args[i] + "` is not a valid voice channel.", message, client) });
+            message.channel.send({ "embeds": [generateStandardEmbed(standardEmbedMes, "Error", message.author.toString() + " `" + args[i] + "` is not a valid voice channel.", message, client)] });
             return;
         }
         channels.push(channelTest.id);
@@ -126,6 +126,7 @@ async function shuffleVoiceFunc(message, client, args, prefix, mysqlCon) {
     }
 
 }
+
 async function shuffle(a) {
     return new Promise(result => {
         var j, x, i;
